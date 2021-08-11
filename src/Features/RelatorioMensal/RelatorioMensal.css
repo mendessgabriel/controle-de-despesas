@@ -1,0 +1,26 @@
+html, body {
+    margin:0px;
+}
+
+.modal {
+    background: black;
+    position: absolute;
+    top: 0px;
+    opacity: 0.4;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.modalCard {
+    padding: 1rem;
+    background: white;
+    width: 30rem;
+    margin: 0 auto;
+    border-radius: 10px;
+    color: black;
+    font-weight: bold;
+    z-index: 1;
+    position: relative;
+    top: 10rem;
+}
