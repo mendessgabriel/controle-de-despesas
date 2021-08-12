@@ -217,6 +217,25 @@
   bottom: 10px;
 }
 
+
+.addBtn .tooltiptext {
+  font-size: medium;
+  visibility: hidden;
+  width: 250px;
+  right: 4rem;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.addBtn:hover .tooltiptext {
+  visibility: visible;
+}
+
 .grow { transition: all .2s ease-in-out; }
 .closeTransacao {
   width: 10%;
@@ -242,7 +261,7 @@
   width: 5rem;
   padding: 1rem;
   text-align: center;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0.5rem;
   cursor: pointer;
   font-family: 'Lato', sans-serif;
   font-weight: bold;
@@ -251,24 +270,4 @@
 .feature:hover {
   animation: 0.5s scale;
   transform: scale(1.10)
-}
-
-.backdrop {
-  opacity: 0.5;
-  background: black;
-  width: 100%;
-  top: 0;
-  left: 0;
-  height: 100%;
-  position: absolute;
-}
-
-.modal {
-  background: black;
-  position: absolute;
-  top: 0px;
-  opacity: 0.4;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
 }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import './App.css';
 import RelatorioMensal from './Features/RelatorioMensal/RelatorioMensal';
 import Feature from './Interface/Feature';
 import Transacao from './Transacao/Transacao';
-
 
 const App = () => {
 
@@ -17,17 +17,26 @@ const App = () => {
   const [addTransacao, setAddTransacao] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<Boolean>(false);
 
-  const clickEvent = (func: string): void => {
-    let feature: JSX.Element = <div></div>;
+  const [screen, setScreen] = useState<number>(0);
 
+  const clickEvent = async (func: string) => {
     switch (func) {
       case 'relatório mensal':
-        feature =  RelatorioMensal();
+        setScreen(1)
+        criaRelatorio(1);
+        break;
+      case 'últimas atividades':
+        setScreen(0);
+        criaRelatorio(0);
+        break;
+      default:
+        setScreen(0);
+        criaRelatorio(0);
         break;
     }
   }
 
-  const [features, setFeatures] = useState<Feature[]>([{ nome: 'relatório mensal', clickEvent }]);
+  const [features, setFeatures] = useState<Feature[]>([{ nome: 'últimas atividades', clickEvent }, { nome: 'relatório mensal', clickEvent }]);
 
   const handleScroll = () => {
     if (window.pageYOffset < 200) {
@@ -51,8 +60,10 @@ const App = () => {
     setTransacao({ ...transacao, valor: Number(e.target.value) });
   }
 
-  const adicionaTransacao = () => {
+  const adicionaTransacao = async () => {
     if (transacao.nome.length === 0 && transacao.valor === 0) return;
+
+    setTransacao({ ...transacao, data: new Date() });
 
     let novoSaldo: number = 0;
 
@@ -99,29 +110,33 @@ const App = () => {
     );
   }
 
-  const criaRelatorio = (): JSX.Element => {
-    return (
-      <div className="relatorios">
-        <div className="saldoOcultar">
-          <label>últimas atividades</label>
-          <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
-        </div>
-        {relatorio && relatorio.length > 0 ? relatorio.map((rel, index) => {
-          return (
-            <div className="relatorio" key={index}>
-              <div>{geraData()}</div>
-              <div className="valoresDIV">
-                <span>{valoresOcultosRelatorio ? '***' : rel.nome}</span>
-                <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span>
+  const criaRelatorio = (screen?: number): JSX.Element => {
+    if (screen === 0) {
+      return (
+        <div className="relatorios">
+          <div className="saldoOcultar">
+            <label>últimas atividades</label>
+            <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
+          </div>
+          {relatorio && relatorio.length > 0 ? relatorio.map((rel, index) => {
+            return (
+              <div className="relatorio" key={index}>
+                <div>{geraData()}</div>
+                <div className="valoresDIV">
+                  <span>{valoresOcultosRelatorio ? '***' : rel.nome}</span>
+                  <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span>
+                </div>
+
+                <div className="badge"></div>
               </div>
+            )
+          }) : <p>sem atividades</p>}
+        </div>
+      )
+    } else {
+      return RelatorioMensal(relatorio, geraData);
+    }
 
-
-              <div className="badge"></div>
-            </div>
-          )
-        }) : <p>sem atividades</p>}
-      </div>
-    )
   }
 
   const criaTransacao = (): JSX.Element => {
@@ -147,6 +162,7 @@ const App = () => {
     return (
       <div className="addBtn" onClick={() => setAddTransacao(!addTransacao)}>
         +
+        <span className="tooltiptext">adicione uma nova transação</span>
       </div>
     );
   }
@@ -163,6 +179,10 @@ const App = () => {
     )
   }
 
+  useEffect(() => {
+    clickEvent('');
+  }, []);
+
   return (
     <div className="App">
       {criaVisaoSaldo('valores')}
@@ -171,7 +191,8 @@ const App = () => {
         {criaFeatures()}
       </div>
 
-      {criaRelatorio()}
+      {criaRelatorio(screen)}
+
       {addTransacao ? criaTransacao() : criaAddBtn()}
     </div>
   );
