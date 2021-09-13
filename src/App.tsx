@@ -19,6 +19,9 @@ const App = () => {
 
   const [screen, setScreen] = useState<number>(0);
 
+  const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const [monthChosen, setMonthChosen] = useState<number>(0);
+
   const clickEvent = async (func: string) => {
     switch (func) {
       case 'relatório mensal':
@@ -83,6 +86,10 @@ const App = () => {
     setRelatorio([...relatorio, transacao]);
   }
 
+  const changeMonth = (event: React.ChangeEvent<{ value: any }>) => {
+    setMonthChosen(parseInt(event.target.value));
+  }
+
   const geraData = () => {
     var data = new Date(),
       dia = data.getDate().toString(),
@@ -115,16 +122,22 @@ const App = () => {
       return (
         <div className="relatorios">
           <div className="saldoOcultar">
-            <label>últimas atividades</label>
+            {/* <label>últimas atividades</label> */}
             <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
           </div>
           {relatorio && relatorio.length > 0 ? relatorio.map((rel, index) => {
             return (
               <div className="relatorio" key={index}>
-                <div>{geraData()}</div>
+                <div>
+                  <div className="dataevalor">
+                    <span>{geraData()}</span>
+                    <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span>
+                  </div>
+                </div>
+                {/* <div>{geraData()}</div> */}
                 <div className="valoresDIV">
                   <span>{valoresOcultosRelatorio ? '***' : rel.nome}</span>
-                  <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span>
+                  {/* <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span> */}
                 </div>
 
                 <div className="badge"></div>
@@ -134,7 +147,32 @@ const App = () => {
         </div>
       )
     } else {
-      return RelatorioMensal(relatorio, geraData);
+      if(monthChosen === 0)
+        setMonthChosen(new Date().getMonth() + 1);
+
+      let rels: Transacao[] = relatorio.filter(rel => rel.data.getMonth() + 1 === monthChosen);
+
+      return (
+        <div className="relatorios">
+          <div className="saldoOcultar">
+            <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
+            <div  className="ocultar overrideOcultar">
+              <span>selecione o mês desejado: </span>
+              <select name="month" defaultValue={monthChosen} id="month" onChange={changeMonth}>
+                {months.map((mt, i) => {
+                  return (
+                    <option key={i}>
+                      {mt}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+          </div>
+
+          {RelatorioMensal(rels, geraData, valoresOcultosRelatorio)}
+        </div>
+      );
     }
 
   }
@@ -171,7 +209,7 @@ const App = () => {
     return (
       features.map((ft, index) => {
         return (
-          <div className="feature" key={index} onClick={() => ft.clickEvent(ft.nome)}>
+          <div className={screen === index ? 'featureClicked' : 'feature'} key={index} onClick={() => ft.clickEvent(ft.nome)}>
             {ft.nome}
           </div>
         );
