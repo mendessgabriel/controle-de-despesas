@@ -2,10 +2,10 @@ import Transacao from '../../Transacao/Transacao';
 import './RelatorioMensal.css';
 import '../../App.css';
 
-const RelatorioMensal = (relatorios: Transacao[], geraData: () => string, valoresOcultosRelatorio: boolean) => {
+const RelatorioMensal = (relatorios: Transacao[], geraData: () => string, valoresOcultosRelatorio: boolean, formatPercentValue: (str?: string) => string) => {
     return (
         <div>
-            {relatorios.map((rel, index) => {
+            {relatorios && relatorios.length > 0 ? relatorios.map((rel, index) => {
                 return (
                     <div className="relatorio" key={index}>
                         <div>
@@ -17,12 +17,19 @@ const RelatorioMensal = (relatorios: Transacao[], geraData: () => string, valore
 
                         <div className="valoresDIV">
                             <span>{valoresOcultosRelatorio ? '***' : rel.nome}</span>
+                            <div></div>
+                            <div className="lucroEIcon">
+                                lucro: <span className={rel.porcentagemSobSaldoAtual.includes('-') ? 'despesa' : 'lucro'}>
+                                    {formatPercentValue(rel.porcentagemSobSaldoAtual)}
+                                </span>
+                                <div className={!rel.valor.toString().includes('-') ? "arrow-up" : "arrow-down"}></div>
+                            </div>
                         </div>
 
                         <div className="badge"></div>
                     </div>
                 )
-            })}
+            }) : <p>sem atividades</p>}
         </div>
     );
 }

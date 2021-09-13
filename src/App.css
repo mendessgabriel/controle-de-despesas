@@ -138,6 +138,7 @@
 
 .relatorio div.valoresDIV {
   padding-bottom: 0.5rem;
+  display: flex;
 }
 
 .relatorio div:first-child {
@@ -149,9 +150,42 @@
 
 .valoresDIV span:first-child {
   float: left;
-  font-size: large;
   font-weight: bold;
   margin-left: 1rem;
+  width: 63%;
+  text-align: initial;
+}
+
+.valoresDIV span:last-child {
+  position: relative;
+  float: right;
+  margin-right: 1rem;
+}
+
+.lucro {
+  color: #07C63A;
+}
+.despesa {
+  color: red;
+}
+
+.lucroEIcon {
+  display: flex;
+}
+
+.arrow-up {
+  background-image: url('./Img/arrow-up.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 20px;
+}
+.arrow-down {
+  background-image: url('./Img/arrow-down.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 20px;
 }
 
 .btns {

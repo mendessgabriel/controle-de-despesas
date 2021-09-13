@@ -66,6 +66,9 @@ const App = () => {
   const adicionaTransacao = async () => {
     if (transacao.nome.length === 0 && transacao.valor === 0) return;
 
+    let porcentagemSaldoAtual: string = geraPorcentagem(transacao.valor);
+    transacao.porcentagemSobSaldoAtual = porcentagemSaldoAtual;
+
     setTransacao({ ...transacao, data: new Date() });
 
     let novoSaldo: number = 0;
@@ -94,7 +97,7 @@ const App = () => {
     var data = new Date(),
       dia = data.getDate().toString(),
       diaF = (dia.length === 1) ? '0' + dia : dia,
-      mes = (data.getMonth() + 1).toString(), //+1 pois no getMonth Janeiro começa com zero.
+      mes = (data.getMonth() + 1).toString(),
       mesF = (mes.length === 1) ? '0' + mes : mes,
       anoF = data.getFullYear();
     return diaF + "/" + mesF + "/" + anoF;
@@ -117,12 +120,34 @@ const App = () => {
     );
   }
 
+  const geraPorcentagem = (valor: number): string => {
+    let porcentagem: number = parseFloat(valor.toString()) / (saldo === 0 ? 1 : saldo);
+
+    return porcentagem.toString();
+  }
+
+  const formatPercentValue = (str?: string): string => {
+    if (!str) return '';
+
+    let formatedStr: string = str.charAt(0);
+    let newStr: string = '';
+
+    if (formatedStr == '-') {
+      newStr = str.charAt(0) + str.charAt(3) + (str.charAt(4) != '' ? str.charAt(4) : '0') + '.' + (str.charAt(5) != '' ? str.charAt(5) : '0') + (str.charAt(6) != '' ? str.charAt(6) : '0');
+    } else if (formatedStr == '0') {
+      newStr = str.charAt(1) + str.charAt(2) + '.' + str.charAt(3) + str.charAt(4);
+    } else {
+      newStr = formatedStr + str.charAt(1) + (str.charAt(2) ? str.charAt(2) : '0') + '.' + (str.charAt(3) ? str.charAt(3) : '0') + (str.charAt(4) ? str.charAt(4) : '0');
+    }
+
+    return newStr + '%';
+  }
+
   const criaRelatorio = (screen?: number): JSX.Element => {
     if (screen === 0) {
       return (
         <div className="relatorios">
           <div className="saldoOcultar">
-            {/* <label>últimas atividades</label> */}
             <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
           </div>
           {relatorio && relatorio.length > 0 ? relatorio.map((rel, index) => {
@@ -134,10 +159,17 @@ const App = () => {
                     <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span>
                   </div>
                 </div>
-                {/* <div>{geraData()}</div> */}
                 <div className="valoresDIV">
                   <span>{valoresOcultosRelatorio ? '***' : rel.nome}</span>
-                  {/* <span>R$ {valoresOcultosRelatorio ? '***' : rel.valor}</span> */}
+                  <div>
+                  </div>
+                  <div className="lucroEIcon">
+                    lucro: <span className={rel.porcentagemSobSaldoAtual.includes('-') ? 'despesa' : 'lucro'}>
+                      {formatPercentValue(rel.porcentagemSobSaldoAtual)}
+                    </span>
+                    <div className={!rel.valor.toString().includes('-') ? "arrow-up" : "arrow-down"}></div>
+                  </div>
+
                 </div>
 
                 <div className="badge"></div>
@@ -147,7 +179,7 @@ const App = () => {
         </div>
       )
     } else {
-      if(monthChosen === 0)
+      if (monthChosen === 0)
         setMonthChosen(new Date().getMonth() + 1);
 
       let rels: Transacao[] = relatorio.filter(rel => rel.data.getMonth() + 1 === monthChosen);
@@ -156,7 +188,7 @@ const App = () => {
         <div className="relatorios">
           <div className="saldoOcultar">
             <div className="ocultar" onClick={() => setValoresOcultosRelatorio(!valoresOcultosRelatorio)}>ocultar relatório</div>
-            <div  className="ocultar overrideOcultar">
+            <div className="ocultar overrideOcultar">
               <span>selecione o mês desejado: </span>
               <select name="month" defaultValue={monthChosen} id="month" onChange={changeMonth}>
                 {months.map((mt, i) => {
@@ -170,7 +202,7 @@ const App = () => {
             </div>
           </div>
 
-          {RelatorioMensal(rels, geraData, valoresOcultosRelatorio)}
+          {RelatorioMensal(rels, geraData, valoresOcultosRelatorio, formatPercentValue)}
         </div>
       );
     }
